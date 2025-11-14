@@ -1,0 +1,84 @@
+version: "3.8"
+services:
+  frontend:
+    build: ./frontend
+    container_name: wm_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - retail_inquiry
+      - retail_assortment
+    networks:
+      - wm-net
+    environment:
+     - VITE_API_ASSORTMENT=http://retail_assortment:8000
+     - VITE_API_CATALOG=http://retail_catalog:8000
+      - VITE_API_INQUIRY=http://retail_inquiry:8000
+
+
+  retail_inquiry:
+    build: ./retail-customer-inquiry-triage-fastapi
+    container_name: retail_inquiry
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - wm-net
+
+  retail_assortment:
+    build: ./retail-assortment-agent-langgraph
+    container_name: retail_assortment
+    # usa el comando apropiado del proyecto; este es un placeholder
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
+    ports:
+      - "8001:8001"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - wm-net
+
+  # ejemplo de un 3er servicio (ajusta o elimina si no existe)
+  retail_catalog:
+    build: ./retail-catalog-normalizer-crewai
+    container_name: retail_catalog
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8002", "--reload"]
+    ports:
+      - "8002:8002"
+    networks:
+      - wm-net
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: wm_prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - wm-net
+
+  grafana:
+    image: grafana/grafana:9.5.0
+    container_name: wm_grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./monitoring/grafana-provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - wm-net
+
+volumes:
+  grafana-storage:
+
+networks:
+  wm-net:
+    driver: bridge
+

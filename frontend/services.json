@@ -1,0 +1,23 @@
+[
+  {
+    "id": "retail_inquiry",
+    "name": "Customer Inquiry (FastAPI)",
+    "host": "retail_inquiry",
+    "port": 8000,
+    "path": "/predict"
+  },
+  {
+    "id": "retail_assortment",
+    "name": "Assortment Agent",
+    "host": "retail_assortment",
+    "port": 8001,
+    "path": "/api/run"
+  },
+  {
+    "id": "retail_catalog",
+    "name": "Catalog Normalizer",
+    "host": "retail_catalog",
+    "port": 8002,
+    "path": "/normalize"
+  }
+]
