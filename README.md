@@ -1,4 +1,4 @@
-# Walmart AI Portfolio — 20 Repos (Scaffold)
+#AI Portfolio — 20 Repos (Scaffold)
 
 This bundle contains 20 ready-to-run repository scaffolds.
 
